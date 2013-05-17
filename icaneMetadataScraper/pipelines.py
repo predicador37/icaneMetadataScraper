@@ -14,6 +14,5 @@ class IcaneMetadataPipeline(object):
             if units:
                 raise DropItem("Empty unit field in %s" % item)
 
-                
             else:
                 return item #return only objects with empty units

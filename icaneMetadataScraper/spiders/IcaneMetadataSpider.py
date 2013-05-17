@@ -13,6 +13,7 @@ class IcaneMetadataSpider(BaseSpider):
     def parse(self, response):
         x = HtmlXPathSelector(response)
         metadata = IcaneMetadataItem()
+        metadata['uri'] = response.url   
         metadata['sourceLabel'] = x.select("//div[@id='contFooter']/div[@id='footer']/div[@id='lftmetadata']/ul/li[1]/span/a/text()").extract()
         metadata['sourceLink'] = x.select("//div[@id='contFooter']/div[@id='footer']/div[@id='lftmetadata']/ul/li[1]/span/a/@href").extract()
         metadata['initialPeriod'] = x.select("//div[@id='contFooter']/div[@id='footer']/div[@id='lftmetadata']/ul/li[2]/span[2]/text()").extract()
