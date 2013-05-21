@@ -6,7 +6,7 @@ class IcaneMetadataSpider(BaseSpider):
     name = "metadata"
     allowed_domains = ["icane.es"]
     start_urls = [
-        "http://www.icane.es/data/regional-data/society/health-social-welfare/nhs-2012-population-health-status-last-12-months-gender#timeseries",
+        "http://www.icane.es/data/historical-data/economy/labour-market/all-workers-affiliated-social-security-regimes-1988-2000#timeseries",
 "http://www.icane.es/data/regional-data/society/health-social-welfare/disabled-population-need-reception-social-health-services-gender#timeseries"
     ]
 

@@ -15,15 +15,17 @@ class IcaneMetadataPipeline(object):
         dispatcher.connect(self.spider_opened, signals.spider_opened)
         dispatcher.connect(self.spider_closed, signals.spider_closed)
         self.files = {}
+    @classmethod
+    def from_crawler(cls, crawler):
+        pipeline = cls()
+        crawler.signals.connect(pipeline.spider_opened, signals.spider_opened)
+        crawler.signals.connect(pipeline.spider_closed, signals.spider_closed)
+        return pipeline
 
     def spider_opened(self, spider):
-        file = open('metadata_problems.json', 'w+b')
-        fieldsToExport = []
-        fieldsToExport.append('uri')
-        fieldsToExport.append('units')
-        self.files[spider] = file
-        self.exporter = JsonItemExporter(file, )
-        self.exporter.start_exporting()
+        pass
+        
+       
 
     def spider_closed(self, spider):
         self.exporter.finish_exporting()
@@ -31,12 +33,20 @@ class IcaneMetadataPipeline(object):
         file.close()
 
     def process_item(self, item, spider):
-        
-        if item['units']:
-            units =  re.sub('[.]','',item['units'][0]) #remove any dot
-            units = ''.join(units.split()) #remove whitespaces
-            if units:
-                raise DropItem("Not empty unit field in %s" % item)
+        file = open('metadata_problems.json', 'w+b')
+        self.fields_to_export = ['uri','units','dataUpdated']
+        self.files[spider] = file
+        self.exporter = JsonItemExporter(file,fields_to_export=self.fields_to_export )
+        self.exporter.start_exporting()
+        if item['dataUpdated']:
+            dataUpdated = ''.join(item['dataUpdated'][0].split())
+            if dataUpdated:
+                raise DropItem("Not empty dataUpdated field in %s" % item)
+       ## if item['units']:
+        ##    units =  re.sub('[.]','',item['units'][0]) #remove any dot
+         ##   units = ''.join(units.split()) #remove whitespaces
+          ##  if units:
+           ##     raise DropItem("Not empty unit field in %s" % item)
 
             else:
                 self.exporter.export_item(item)
