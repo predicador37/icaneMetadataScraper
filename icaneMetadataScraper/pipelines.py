@@ -23,7 +23,7 @@ class IcaneMetadataPipeline(object):
         return pipeline
 
     def spider_opened(self, spider):
-        file = open('metadata_historical.csv', 'w+b')
+        file = open('metadata_regional.csv', 'w+b')
         self.files[spider] = file
         self.exporter = CsvItemExporter(file)
         self.exporter.fields_to_export = ['uri', 'dataUpdated', 'units', 'sourceLink', 'initialPeriod', 'lastPeriod', 'sourceLabel', 'periodicity', 'referenceArea']        

@@ -6,7 +6,7 @@ import uri_util
 
 class IcaneMetadataSpider(BaseSpider):
 
-    API_CALL_URI = 'http://www.icane.es/metadata/api/historical-data/time-series-list'
+    API_CALL_URI = 'http://www.icane.es/metadata/api/regional-data/time-series-list'
         
     name = "metadata"
     start_urls = []
