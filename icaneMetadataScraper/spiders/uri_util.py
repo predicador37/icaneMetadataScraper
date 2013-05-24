@@ -24,9 +24,8 @@ def findLink(node, links):
     
         
 def findUris(data):
-   
     if str(data['nodeType']['uriTag'])=='time-series' or str(data['nodeType']['uriTag'])=='non-olap-native':
-        if 'uri' in data and ((str(data['nodeType']['uriTag'])=='time-series') or (str(data['nodeType']['uriTag'])=='non-olap-native')):
+        if 'uri' in data:
             yield data['uri']
     for k in data:
         if isinstance(data[k], list) and k not in ['apiUris','links','sources']:
@@ -39,10 +38,13 @@ def getUris(rootUri):
     links = []
     content = getLiveJson(rootUri)
     nodes = json.load(content)
-    print "LEN NODES: " + str(len(nodes))
-    for node in nodes:
-        links = links + list(findUris(node))
-    print "LEN LINKS:" + str(len(links))
+    if isinstance(nodes, list):
+        for node in nodes:
+            links = links + list(findUris(node))
+    else:
+        links = findUris(nodes)
+    #print "Total initial nodes to scrap: " + str(len(nodes))      
+    #print "Total scraped URIs: " + str(len(links))      
     #for link in links:
-   #     print link
+    #    print link
     return links

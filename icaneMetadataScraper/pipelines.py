@@ -6,7 +6,7 @@ from scrapy.exceptions import DropItem
 import re
 from scrapy.xlib.pydispatch import dispatcher
 from scrapy import signals
-from scrapy.contrib.exporter import JsonItemExporter
+from scrapy.contrib.exporter import CsvItemExporter
 
 
 class IcaneMetadataPipeline(object):
@@ -23,7 +23,11 @@ class IcaneMetadataPipeline(object):
         return pipeline
 
     def spider_opened(self, spider):
-        pass
+        file = open('metadata_historical.csv', 'w+b')
+        self.files[spider] = file
+        self.exporter = CsvItemExporter(file)
+        self.exporter.fields_to_export = ['uri', 'dataUpdated', 'units', 'sourceLink', 'initialPeriod', 'lastPeriod', 'sourceLabel', 'periodicity', 'referenceArea']        
+        self.exporter.start_exporting()
         
        
     def spider_closed(self, spider):
@@ -33,40 +37,38 @@ class IcaneMetadataPipeline(object):
         
 
     def process_item(self, item, spider):
-        file = open('metadata_problems.json', 'w+b')
-        self.fields_to_export = ['uri']
-        self.files[spider] = file
 
-        
-        if not item['sourceLabel'][0]:
-            self.fields_to_export.append('sourceLabel')
-        if not item['sourceLink'][0]:
-            self.fields_to_export.append('sourceLink')
-        if not item['initialPeriod'][0]:
-            self.fields_to_export.append('initialPeriod')
-        if not item['lastPeriod'][0]:
-            self.fields_to_export.append('lastPeriod')
-        if not item['units'][0]:
-            self.fields_to_export.append('units')
-        if not item['periodicity'][0]:
-            self.fields_to_export.append('periodicity')
-        if not item['referenceArea'][0]:
-            self.fields_to_export.append('referenceArea')
-        if not item['dataUpdated'][0]: 
-            self.fields_to_export.append('dataUpdated')
-        if item['units'][0]:        
+        if not item['sourceLabel'] or not item['sourceLabel'][0]:
+            self.exporter.export_item(item)
+            return item #return only items with any empty field
+        elif not item['sourceLink'] or not item['sourceLink'][0]:
+            self.exporter.export_item(item)
+            return item #return only items with any empty field
+        elif not item['initialPeriod'] or not item['initialPeriod'][0]:
+            self.exporter.export_item(item)
+            return item #return only items with any empty field
+        elif not item['lastPeriod'] or not item['lastPeriod'][0]:
+            self.exporter.export_item(item)
+            return item #return only items with any empty field
+        elif not item['periodicity'] or not item['periodicity'][0]:
+            self.exporter.export_item(item)
+            return item #return only items with any empty field
+        elif not item['referenceArea'] or not item['referenceArea'][0]:
+            self.exporter.export_item(item)
+            return item #return only items with any empty field
+        elif not item['dataUpdated'] or not item['dataUpdated'][0]: 
+            self.exporter.export_item(item)
+            return item #return only items with any empty field
+        elif item['units'][0]:        
             units =  re.sub('[.]','',item['units'][0]) #remove any dot
             units = ''.join(units.split()) #remove whitespaces
             if not units:
-                self.fields_to_export.append('units')
-        if len(self.fields_to_export) == 1:
-             raise DropItem("Discarded object: it's properly populated")
+                self.exporter.export_item(item)
+                return item #return only items with any empty field
+        else:
+            raise DropItem("Discarded item: metadata fields filled.")  
                 
-        self.exporter = JsonItemExporter(file,fields_to_export=self.fields_to_export )
-        self.exporter.start_exporting()
-        self.exporter.export_item(item)
-                
-        return item #return only objects with empty units
+        
         
     
         
