@@ -6,7 +6,7 @@ import uri_util
 
 class IcaneMetadataSpider(BaseSpider):
 
-    API_CALL_URI = 'http://www.icane.es/metadata/api/regional-data/time-series-list'
+    API_CALL_URI = 'http://www.icane.es/metadata/api/historical-data/time-series-list'
         
     name = "metadata"
     start_urls = []
@@ -20,7 +20,8 @@ class IcaneMetadataSpider(BaseSpider):
         items = []
         x = HtmlXPathSelector(response)
         metadata = IcaneMetadataItem()
-        metadata['uri'] = response.url   
+        metadata['uri'] = response.url
+        metadata['title'] = x.select("//html/body/form/div/div/h2/text()").extract()
         metadata['sourceLabel'] = x.select("//div[@id='contFooter']/div[@id='footer']/div[@id='lftmetadata']/ul/li[1]/span/a/text()").extract()
         metadata['sourceLink'] = x.select("//div[@id='contFooter']/div[@id='footer']/div[@id='lftmetadata']/ul/li[1]/span/a/@href").extract()
         if not metadata['sourceLabel']:

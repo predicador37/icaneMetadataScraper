@@ -28,7 +28,7 @@ def findUris(data):
         if 'uri' in data:
             yield data['uri']
     for k in data:
-        if isinstance(data[k], list) and k not in ['apiUris','links','sources']:
+        if isinstance(data[k], list) and k not in ['apiUris','links','sources','measures']:
             for i in data[k]:
                 for j in findUris(i):
                     yield j
@@ -38,6 +38,7 @@ def getUris(rootUri):
     links = []
     content = getLiveJson(rootUri)
     nodes = json.load(content)
+
     if isinstance(nodes, list):
         for node in nodes:
             links = links + list(findUris(node))
